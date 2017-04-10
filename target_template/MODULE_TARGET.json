@@ -1,0 +1,10 @@
+{
+  "name": "core-adc",
+  "description": "core-adc",
+  "module": "adc",
+  "required_packages": [],
+  "sources": [
+    "main.cpp"
+  ],
+  "includes": []
+}
