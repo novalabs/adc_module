@@ -23,7 +23,7 @@
 using LED_PAD = core::hw::Pad_<core::hw::GPIO_F, GPIOF_LED>;
 static LED_PAD _led;
 
-static core::hw::Pad_<core::hw::GPIO_A, 3> _adcReset;
+static core::hw::Pad_<core::hw::GPIO_A, 3>  _adcReset;
 static core::hw::Pad_<core::hw::GPIO_B, 10> _adcStart;
 static core::hw::EXTChannel_<core::hw::EXT_1, 11, EXT_CH_MODE_FALLING_EDGE | EXT_MODE_GPIOB> _adcDataReady;
 
@@ -62,51 +62,20 @@ static core::os::Thread::Stack<1024> management_thread_stack;
 static core::mw::RTCANTransport      rtcantra(&RTCAND1);
 
 RTCANConfig rtcan_config = {
-   1000000, 100, 60
+    1000000, 100, 60
 };
 
-#if CORE_USE_CONFIGURATION_STORAGE
-#include <core/stm32_flash/FlashSegment.hpp>
-#include <core/mw/CoreConfigurationManager.hpp>
-
-static core::stm32_flash::FlashSegment         _configurationBank1(core::stm32_flash::CONFIGURATION1_FLASH_FROM, core::stm32_flash::CONFIGURATION1_FLASH_TO);
-static core::stm32_flash::FlashSegment         _configurationBank2(core::stm32_flash::CONFIGURATION2_FLASH_FROM, core::stm32_flash::CONFIGURATION2_FLASH_TO);
-static core::stm32_flash::Storage              _userStorage(_configurationBank1, _configurationBank2);
-static core::stm32_flash::ConfigurationStorage _configurationStorage(_userStorage);
-
-class STM32FlashConfigurationStorage:
-    public core::mw::CoreConfigurationStorage
-{
-public:
-    STM32FlashConfigurationStorage(
-        core::stm32_flash::ConfigurationStorage& storage
-    ) : _storage(storage) {}
-
-    void*
-    data()
-    {
-        return _storage.getUserConfiguration();
-    }
-
-    std::size_t
-    size()
-    {
-        return _storage.userDataSize();
-    }
-
-private:
-    core::stm32_flash::ConfigurationStorage& _storage;
-};
-
-static STM32FlashConfigurationStorage _coreConfigurationStorage(_configurationStorage);
-
-core::mw::CoreConfigurationStorage& Module::configurationStorage = _coreConfigurationStorage;
-#endif // ifdef CORE_USE_CONFIGURATION_STORAGE
+// ----------------------------------------------------------------------------
+// CoreModule STM32FlashConfigurationStorage
+// ----------------------------------------------------------------------------
+#include <core/snippets/CoreModuleSTM32FlashConfigurationStorage.hpp>
+// ----------------------------------------------------------------------------
 
 core::mw::Middleware
 core::mw::Middleware::instance(
     ModuleConfiguration::MODULE_NAME
 );
+
 
 Module::Module()
 {}
@@ -116,78 +85,27 @@ Module::initialize()
 {
 //	core_ASSERT(core::mw::Middleware::instance.is_stopped()); // TODO: capire perche non va...
 
-   static bool initialized = false;
+    static bool initialized = false;
 
-   if (!initialized) {
-       halInit();
-       chSysInit();
+    if (!initialized) {
+        halInit();
+        chSysInit();
 
-       const char* module_name = moduleName();
-#if CORE_USE_CONFIGURATION_STORAGE
-       module_name = _configurationStorage.getModuleConfiguration()->name;
-#endif
-       core::mw::Middleware::instance.initialize(module_name, management_thread_stack, management_thread_stack.size(), core::os::Thread::LOWEST);
+        core::mw::Middleware::instance.initialize(name(), management_thread_stack, management_thread_stack.size(), core::os::Thread::LOWEST);
+        rtcantra.initialize(rtcan_config, canID());
+        core::mw::Middleware::instance.start();
 
-       uint8_t module_id = 0xFF;
-#if CORE_USE_CONFIGURATION_STORAGE
-       module_id = _configurationStorage.getModuleConfiguration()->moduleID;
-#endif
+        core::hw::EXT_<core::hw::EXT_1>::start(_ext_config);
+        _spi.start(_spi_config);
 
-       if (module_id == 0xFF) {
-           module_id = moduleID();
-       }
+        initialized = true;
+    }
 
-       rtcantra.initialize(rtcan_config, module_id);
-
-       core::mw::Middleware::instance.start();
-
-       core::hw::EXT_<core::hw::EXT_1>::start(_ext_config);
-       _spi.start(_spi_config);
-
-       initialized = true;
-   }
-
-   return initialized;
+    return initialized;
 } // Board::initialize
 
 // ----------------------------------------------------------------------------
 // CoreModule HW specific implementation
 // ----------------------------------------------------------------------------
-
-void
-core::mw::CoreModule::Led::toggle()
-{
-    _led.toggle();
-}
-
-void
-core::mw::CoreModule::Led::write(
-    unsigned on
-)
-{
-    _led.write(on);
-}
-
-void
-core::mw::CoreModule::reset()
-{
-    core::hw::IWDG_::woof();
-}
-
-void
-core::mw::CoreModule::keepAlive()
-{
-    core::hw::IWDG_::reload();
-}
-
-void
-core::mw::CoreModule::disableBootloader()
-{
-    RTC->BKP0R = 0x55AA55AA; // TODO: wrap it somewhere.
-}
-
-void
-core::mw::CoreModule::enableBootloader()
-{
-    RTC->BKP0R = 0xB0BAFE77; // TODO: wrap it somewhere.
-}
+#include <core/snippets/CoreModuleHWSpecificImplementation.hpp>
+// ----------------------------------------------------------------------------

@@ -11,6 +11,12 @@
 
 #undef ADC // Workaround for ST header files macro
 
+namespace core {
+namespace ADS1262_driver {
+class ADS1262;
+}
+}
+
 #if CORE_USE_CONFIGURATION_STORAGE
 namespace core {
 namespace mw {
@@ -18,29 +24,24 @@ class CoreConfigurationStorage;
 }
 }
 #endif
-namespace core {
-namespace ADS1262_driver {
-class ADS1262;
-}
-}
 
 class Module:
-   public core::mw::CoreModule
+    public core::mw::CoreModule
 {
 public:
-   static bool
-   initialize();
-
-   using ADC = core::ADS1262_driver::ADS1262;
+    using ADC = core::ADS1262_driver::ADS1262;
 
 // --- DEVICES ----------------------------------------------------------------
-   static ADC& adc;
+    static ADC& adc;
 // ----------------------------------------------------------------------------
 
-#if CORE_USE_CONFIGURATION_STORAGE
-   static core::mw::CoreConfigurationStorage& configurationStorage;
-#endif
+    static bool
+    initialize();
 
-   Module();
-   virtual ~Module() {}
+
+#if CORE_USE_CONFIGURATION_STORAGE
+    static core::mw::CoreConfigurationStorage& configurationStorage;
+#endif
+    Module();
+    virtual ~Module() {}
 };
