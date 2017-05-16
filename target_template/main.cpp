@@ -62,6 +62,7 @@ adcThread(
         auto status = Module::adc.getStatus();
 
         status.pgal_alm = 0;
+
         if (status & 0b01000000) {
             // We have a new sample...
             int32_t x = Module::adc.getRaw();
@@ -82,7 +83,7 @@ adcThread(
                 _filteredValue = 0; // Reset the accumulator
 
                 if (publisher.alloc(msgp)) {
-                    msgp->value    = tmp;
+                    msgp->value = tmp;
 
                     if (!publisher.publish(*msgp)) {}
                 }
@@ -93,37 +94,37 @@ adcThread(
 
 // MAIN
 extern "C" {
-   int
-   main()
-   {
-      module.initialize();
+    int
+    main()
+    {
+        module.initialize();
 
-      // Led subscriber node
-      core::led::SubscriberConfiguration led_subscriber_configuration;
-      led_subscriber_configuration.topic = "led";
-      led_subscriber.setConfiguration(led_subscriber_configuration);
-      module.add(led_subscriber);
+        // Led subscriber node
+        core::led::SubscriberConfiguration led_subscriber_configuration;
+        led_subscriber_configuration.topic = "led";
+        led_subscriber.setConfiguration(led_subscriber_configuration);
+        module.add(led_subscriber);
 
-      // Setup and run
-      module.setup();
-      module.run();
+        // Setup and run
+        module.setup();
+        module.run();
 
-      // ADC publisher
-      core::os::Thread::create_heap(NULL, 4096, core::os::Thread::PriorityEnum::NORMAL, adcThread, NULL);
+        // ADC publisher
+        core::os::Thread::create_heap(NULL, 4096, core::os::Thread::PriorityEnum::NORMAL, adcThread, NULL);
 
-      // Is everything going well?
-      for (;;) {
-         if (!module.isOk()) {
-            module.halt("This must not happen!");
-         }
+        // Is everything going well?
+        for (;;) {
+            if (!module.isOk()) {
+                module.halt("This must not happen!");
+            }
 
 #ifdef CORE_USE_BOOTLOADER
             module.keepAlive();
 #endif
 
-         core::os::Thread::sleep(core::os::Time::ms(500));
-      }
+            core::os::Thread::sleep(core::os::Time::ms(500));
+        }
 
-      return core::os::Thread::OK;
-   } // main
+        return core::os::Thread::OK;
+    } // main
 }

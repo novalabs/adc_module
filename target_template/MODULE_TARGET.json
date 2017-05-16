@@ -1,6 +1,6 @@
 {
-  "name": "core-adc",
-  "description": "core-adc",
+  "name": "@@NAME@@",
+  "description": "@@DESCRIPTION@@",
   "module": "adc",
   "required_packages": [],
   "sources": [
