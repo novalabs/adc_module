@@ -152,6 +152,9 @@
 #define GPIOF_PIN14                 14U
 #define GPIOF_PIN15                 15U
 
+#define LED_GPIO	GPIOF
+#define LED_PIN		1
+
 /*
  * IO lines assignments.
  */

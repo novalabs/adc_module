@@ -3,9 +3,9 @@
   "description": "ADS1262 32 bit ADC module",
   "chip": "STM32F303CC",
   "required_packages": [
-    "led",
-    "common_msgs",
     "ADS1262_driver",
+    "stm32_flash",
+    "stm32_crc",
     "snippets"
   ],
   "chibios_components": [

@@ -17,21 +17,12 @@ class ADS1262;
 }
 }
 
-#if CORE_USE_CONFIGURATION_STORAGE
-namespace core {
-namespace mw {
-class CoreConfigurationStorage;
-}
-}
-#endif
-
 class Module:
     public core::mw::CoreModule
 {
 public:
-    using ADC = core::ADS1262_driver::ADS1262;
-
 // --- DEVICES ----------------------------------------------------------------
+    using ADC = core::ADS1262_driver::ADS1262;
     static ADC& adc;
 // ----------------------------------------------------------------------------
 
@@ -39,9 +30,6 @@ public:
     initialize();
 
 
-#if CORE_USE_CONFIGURATION_STORAGE
-    static core::mw::CoreConfigurationStorage& configurationStorage;
-#endif
     Module();
     virtual ~Module() {}
 };
