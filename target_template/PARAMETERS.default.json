@@ -1,0 +1,10 @@
+{
+  "target": "@@NAME@@",
+  "name": "default",
+  "description": "Default configuration",
+  "parameters": {
+    "led_sub": {
+      "topic": "led"
+    }
+  }
+}

@@ -1,0 +1,11 @@
+  {
+  "name": "@@NAME@@",
+  "description": "ADC module template configuration",
+  "objects": [
+    {
+      "object": "led_sub",
+      "package": "led",
+      "parameters": "SubscriberConfiguration"
+    }
+  ]
+}
