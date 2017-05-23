@@ -24,22 +24,22 @@ using LED_PAD = core::hw::Pad_<core::hw::GPIO_F, GPIOF_LED>;
 static LED_PAD _led;
 
 // DEVICES
-static core::hw::Pad_<core::hw::GPIO_A, 3>  _adcReset;
-static core::hw::Pad_<core::hw::GPIO_B, 10> _adcStart;
+static core::hw::Pad_<core::hw::GPIO_A, 3>       _adc_reset;
+static core::hw::Pad_<core::hw::GPIO_B, 10>      _adc_start;
 static core::hw::EXTController_<core::hw::EXT_1> _ext;
-static core::hw::EXTChannel_<core::hw::EXT_1, 11, EXT_CH_MODE_FALLING_EDGE | EXT_MODE_GPIOB> _adcDataReady;
+static core::hw::EXTChannel_<core::hw::EXT_1, 11, EXT_CH_MODE_FALLING_EDGE | EXT_MODE_GPIOB> _adc_data_ready;
+static core::hw::SPIDevice_<core::hw::SPI_1, core::hw::Pad_<core::hw::GPIO_A, 4> > _adc_spi;
 
-using PAD_CS = core::hw::Pad_<core::hw::GPIO_A, 4>;
-static core::hw::SPIDevice_<core::hw::SPI_1, PAD_CS> _spi;
-
-static core::ADS1262_driver::ADS1262 _ads1262(_spi, _adcDataReady, _adcReset, _adcStart);
+// ADC
+static core::ADS1262_driver::ADS1262 _ads1262(_adc_spi, _adc_data_ready, _adc_reset, _adc_start);
 
 // MODULE DEVICES
 core::ADS1262_driver::ADS1262& Module::adc = _ads1262;
 
+// DEVICE CONFIG
 static const SPIConfig _spi_config = {
     NULL, NULL, 0,
-	SPI_CR1_BR_1 | SPI_CR1_BR_2 | SPI_CR1_CPHA
+    SPI_CR1_BR_1 | SPI_CR1_BR_2 | SPI_CR1_CPHA
 };
 
 static EXTConfig _ext_config = {    {
@@ -93,7 +93,7 @@ Module::initialize()
         core::mw::Middleware::instance.start();
 
         _ext.start(_ext_config);
-        _spi.start(_spi_config);
+        _adc_spi.start(_spi_config);
 
         initialized = true;
     }
