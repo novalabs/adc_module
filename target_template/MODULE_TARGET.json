@@ -13,6 +13,6 @@
     "ADCNode.cpp"
   ],
   "includes": [],
-  "bootloader_size": 16384,
-  "configuration_size": 2048
+  "bootloader_size": 0,
+  "configuration_size": 0
 }
