@@ -5,7 +5,7 @@
  */
  
 #include <Module.hpp>
-#include <core/ADS1262_driver/ADS1262.hpp>
+#include <core/ADS126x_driver/ADS126x.hpp>
 
 #include <core/mw/Node.hpp>
 #include <core/mw/Publisher.hpp>
@@ -18,25 +18,25 @@ adcNodeThread(
     void* args
 )
 {
-    using ADC = Module::ADC;
+    using ADC = core::ADS126x_driver::ADC1;
 
     Module::adc.init();
     Module::adc.probe();
     Module::adc.configure();
 
-    Module::adc.setReferenceMux(ADC::ReferenceMuxPositive::INTERNAL_2V5, ADC::ReferenceMuxNegative::INTERNAL_AVSS);
-    Module::adc.setReferencePolarityReversal(false);
+    Module::adc.adc1().setReferenceMux(ADC::ReferenceMuxPositive::INTERNAL_2V5, ADC::ReferenceMuxNegative::INTERNAL_AVSS);
+    Module::adc.adc1().setReferencePolarityReversal(false);
 
-    Module::adc.setInputMux(ADC::InputMuxPositive::AIN_0, ADC::InputMuxNegative::AIN_1);
+    Module::adc.adc1().setInputMux(ADC::InputMuxPositive::AIN_0, ADC::InputMuxNegative::AIN_1);
 
-    Module::adc.setPGA(false, ADC::Gain::GAIN_1);
+    Module::adc.adc1().setPGA(false, ADC::Gain::GAIN_1);
 
-    Module::adc.setDataRate(ADC::DataRate::DATARATE_50);
-    Module::adc.setFilter(ADC::Filter::SINC_3);
-    Module::adc.setDelay(ADC::Delay::_278us);
+    Module::adc.adc1().setDataRate(ADC::DataRate::DATARATE_50);
+    Module::adc.adc1().setFilter(ADC::Filter::SINC_3);
+    Module::adc.adc1().setDelay(ADC::Delay::_278us);
 
     Module::adc.start();
-    Module::adc.calibrateOffset();
+    Module::adc.adc1().calibrateOffset();
     Module::adc.stop();
 
     int64_t _filteredValue = 0;
@@ -50,16 +50,16 @@ adcNodeThread(
     Module::adc.start();
 
     while (1) {
-        Module::adc.wait(); // Wait for a new conversion
-        Module::adc.update();
+        Module::adc.adc1().wait(); // Wait for a new conversion
+        Module::adc.adc1().update();
 
-        auto status = Module::adc.getStatus();
+        auto status = Module::adc.adc1().getStatus();
 
         status.pgal_alm = 0; // Override alarms
 
         if (status & 0b01000000) {
             // We have a new sample...
-            int32_t x = Module::adc.getRaw();
+            int32_t x = Module::adc.adc1().getRaw();
 
             _filteredValue += x; // Accumulate the new sample
 

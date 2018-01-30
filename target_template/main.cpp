@@ -13,7 +13,7 @@
 #include <Module.hpp>
 
 // --- BOARD IMPL -------------------------------------------------------------
-#include <core/ADS1262_driver/ADS1262.hpp>
+#include <core/ADS126x_driver/ADS126x.hpp>
 
 // --- MODULE -----------------------------------------------------------------
 Module module;

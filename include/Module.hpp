@@ -12,7 +12,7 @@
 #undef ADC // Workaround for ST header files macro
 
 namespace core {
-namespace ADS1262_driver {
+namespace ADS126x_driver {
 class ADS1262;
 }
 }
@@ -22,8 +22,7 @@ class Module:
 {
 public:
 // --- DEVICES ----------------------------------------------------------------
-    using ADC = core::ADS1262_driver::ADS1262;
-    static ADC& adc;
+    static core::ADS126x_driver::ADS1262& adc;
 // ----------------------------------------------------------------------------
 
     static bool

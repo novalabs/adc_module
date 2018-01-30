@@ -17,7 +17,7 @@
 
 #include <Module.hpp>
 
-#include <core/ADS1262_driver/ADS1262.hpp>
+#include <core/ADS126x_driver/ADS126x.hpp>
 
 // LED
 using LED_PAD = core::hw::Pad_<core::hw::GPIO_F, GPIOF_LED>;
@@ -31,10 +31,10 @@ static core::hw::EXTChannel_<core::hw::EXT_1, 11, EXT_CH_MODE_FALLING_EDGE | EXT
 static core::hw::SPIDevice_<core::hw::SPI_1, core::hw::Pad_<core::hw::GPIO_A, 4> > _adc_spi;
 
 // ADC
-static core::ADS1262_driver::ADS1262 _ads1262(_adc_spi, _adc_data_ready, _adc_reset, _adc_start);
+static core::ADS126x_driver::ADS1262 _ads1262(_adc_spi, _adc_data_ready, _adc_reset, _adc_start);
 
 // MODULE DEVICES
-core::ADS1262_driver::ADS1262& Module::adc = _ads1262;
+core::ADS126x_driver::ADS1262& Module::adc = _ads1262;
 
 // DEVICE CONFIG
 static const SPIConfig _spi_config = {
